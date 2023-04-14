@@ -29,8 +29,11 @@
 <div id="reload" class="text">Reload : SPACE key</div>
 <div id="score" class="text">Score: 0</div>
 <div id="praise" class="text">見ててあげるからがんばりなさいよ。</div>
+<audio id="bgm" src="audio/maou_bgm_loop_8bit29.mp3" loop></audio>
+<audio id="se_gameover" src="audio/maou_se_onepoint20.mp3" preload="auto"></audio>
 <canvas id="canvas" width="600" height="400"></canvas>
 <script>
+    const bgmElement = document.getElementById('bgm');
     // ジェットの初期位置
     const x = 50;
     let y = 200;
@@ -243,6 +246,8 @@
           document.getElementById('praise').innerHTML = getWarningMessage();
         }
       } else {
+        bgmElement.pause();
+        document.getElementById('se_gameover').play();
         document.getElementById('praise').innerHTML = getResultMessage();
         document.getElementById('praise').style.color = '#f00';
         document.getElementById('reload').style.color = '#f00';
@@ -250,6 +255,8 @@
     }
 
     // レンダリングの開始
+    bgmElement.volume = 0.5;
+    bgmElement.play();
     loop();
 </script>
 </body>
