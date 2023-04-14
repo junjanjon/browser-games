@@ -264,7 +264,9 @@
 
     // レンダリングの開始
     bgmElement.volume = 0.5;
-    bgmElement.play();
+    bgmElement.addEventListener('canplay', () => {
+      bgmElement.play();
+    });
     loop();
 </script>
 </body>
