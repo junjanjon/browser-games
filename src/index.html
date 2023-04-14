@@ -96,6 +96,17 @@
       }
     }
 
+    function scoreUpdate() {
+      if (score < NORMAL_SCORE) {
+        document.getElementById('score').style.color = '#fff';
+      } else if (score < HIGH_SCORE) {
+        document.getElementById('score').style.color = '#faa';
+      } else {
+        document.getElementById('score').style.color = '#f00';
+      }
+      document.getElementById('score').innerHTML = `Score: ${score}`;
+    }
+
     // 画面の更新
     function update() {
       // ジェットの移動
@@ -118,14 +129,7 @@
           if (enemyPlanes[i].x + enemyPlanes[i].size < x) {
             const addScore = (enemyPlanes[i].size ** 2) * (enemyPlanes[i].vx ** 2);
             score += Math.floor(addScore / 100);
-            if (score < NORMAL_SCORE) {
-              document.getElementById('score').style.color = '#fff';
-            } else if (score < HIGH_SCORE) {
-              document.getElementById('score').style.color = '#faa';
-            } else {
-              document.getElementById('score').style.color = '#f00';
-            }
-            document.getElementById('score').innerHTML = `Score: ${score}`;
+            scoreUpdate();
           }
           enemyPlanes.splice(i, 1);
           i--;
@@ -251,8 +255,9 @@
         requestAnimationFrame(loop);
         loopCount++;
         if (loopCount % 200 === 0) {
-          loopCount = 0;
           document.getElementById('praise').innerHTML = getWarningMessage();
+          score += loopCount * 5;
+          scoreUpdate();
         }
       } else {
         bgmElement.pause();
