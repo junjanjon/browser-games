@@ -112,6 +112,19 @@
 
         // 画面外に出た敵機を削除
         if (enemyPlanes[i].x + enemyPlanes[i].size < 0) {
+          // 得点の加算
+          if (enemyPlanes[i].x + enemyPlanes[i].size < x) {
+            const addScore = (enemyPlanes[i].size ** 2) * (enemyPlanes[i].vx ** 2);
+            score += Math.floor(addScore / 100);
+            if (score < NORMAL_SCORE) {
+              document.getElementById('score').style.color = '#fff';
+            } else if (score < HIGH_SCORE) {
+              document.getElementById('score').style.color = '#faa';
+            } else {
+              document.getElementById('score').style.color = '#f00';
+            }
+            document.getElementById('score').innerHTML = `Score: ${score}`;
+          }
           enemyPlanes.splice(i, 1);
           i--;
           continue;
@@ -124,24 +137,18 @@
             && y < enemyPlanes[i].y + enemyPlanes[i].size) {
           return false;
         }
-
-        // 得点の加算
-        if (enemyPlanes[i].x + enemyPlanes[i].size < x && enemyPlanes[i].type === 'big') {
-          score += 100;
-          if (score < NORMAL_SCORE) {
-            document.getElementById('score').style.color = '#fff';
-          } else if (score < HIGH_SCORE) {
-            document.getElementById('score').style.color = '#faa';
-          } else {
-            document.getElementById('score').style.color = '#f00';
-          }
-          document.getElementById('score').innerHTML = `Score: ${score}`;
-        }
       }
 
       // 敵機の生成
       if (Math.random() > 0.95) {
-        generateEnemyPlanes();
+        if (score < NORMAL_SCORE * 4 && enemyPlanes.length > 6) {
+          // 何もしない
+        } else if (score < HIGH_SCORE * 2) {
+          generateEnemyPlanes();
+        } else {
+          generateEnemyPlanes();
+          generateEnemyPlanes();
+        }
       }
       return true;
     }
