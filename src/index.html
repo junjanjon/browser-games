@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jet Game</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #5b5b5b;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        canvas {
+            display: block;
+            background-color: #000;
+        }
+
+        .text {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+<h1>Jet Game</h1>
+<div class="text">Move : Arrow Key '↑', '↓'</div>
+<div id="reload" class="text">Reload : SPACE key</div>
+<div id="score" class="text">Score: 0</div>
+<div id="praise" class="text">Enjoy your flight!</div>
+<canvas id="canvas" width="600" height="400"></canvas>
+<script>
+    // ジェットの初期位置
+    const x = 50;
+    let y = 200;
+
+    // 移動速度
+    let vy = 0;
+
+    // ジェットの大きさ
+    const size = 10;
+
+    // 敵機の配列
+    const enemyPlanes = [];
+
+    // 得点
+    let score = 0;
+
+    // キー入力の処理
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp') { // 上矢印キー
+        vy = -5;
+      } else if (e.key === 'ArrowDown') { // 下矢印キー
+        vy = 5;
+      } else if (e.key === ' ') { // スペースキー
+        window.location.reload();
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        vy = 0;
+      }
+    });
+
+    // キャンバスの取得
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // 敵機の生成
+    function generateEnemyPlanes() {
+      if (Math.random() > 0.5) {
+        enemyPlanes.push({
+          x: canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 50 + 20,
+          vx: -Math.random() * 5 - 2,
+          type: 'big',
+        });
+      } else {
+        enemyPlanes.push({
+          x: canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 20 + 10,
+          vx: -Math.random() * 10 - 5,
+          type: 'small',
+        });
+      }
+    }
+
+    // 画面の更新
+    function update() {
+      // ジェットの移動
+      y += vy;
+
+      // 画面の端に到達したら停止する
+      if (y < 0) {
+        y = 0;
+      } else if (y > canvas.height - size) {
+        y = canvas.height - size;
+      }
+
+      // 敵機の移動と画面外の削除
+      for (let i = 0; i < enemyPlanes.length; i++) {
+        enemyPlanes[i].x += enemyPlanes[i].vx;
+
+        // 画面外に出た敵機を削除
+        if (enemyPlanes[i].x + enemyPlanes[i].size < 0) {
+          enemyPlanes.splice(i, 1);
+          i--;
+          continue;
+        }
+
+        // ジェットと敵機の当たり判定
+        if (x + size > enemyPlanes[i].x
+            && y + size > enemyPlanes[i].y
+            && x < enemyPlanes[i].x + enemyPlanes[i].size
+            && y < enemyPlanes[i].y + enemyPlanes[i].size) {
+          return false;
+        }
+
+        // 得点の加算
+        if (enemyPlanes[i].x + enemyPlanes[i].size < x && enemyPlanes[i].type === 'big') {
+          score += 100;
+          document.getElementById('score').innerHTML = `Score: ${score}`;
+        }
+      }
+
+      // 敵機の生成
+      if (Math.random() > 0.95) {
+        generateEnemyPlanes();
+      }
+      return true;
+    }
+
+    // 画面の描画
+    function draw() {
+      // 画面のクリア
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // ジェットの描画
+      ctx.fillStyle = '#f00';
+      ctx.fillRect(x, y, size, size);
+
+      // 敵機の描画
+      for (let i = 0; i < enemyPlanes.length; i++) {
+        if (enemyPlanes[i].type === 'big') {
+          ctx.fillStyle = '#00f';
+        } else {
+          ctx.fillStyle = '#0ff';
+        }
+        ctx.fillRect(enemyPlanes[i].x, enemyPlanes[i].y, enemyPlanes[i].size, enemyPlanes[i].size);
+      }
+    }
+
+    // レンダリングのループ
+    function loop() {
+      // 画面の更新
+      const flag = update();
+
+      // 画面の描画
+      draw();
+
+      if (flag) {
+        // ループの再帰呼び出し
+        requestAnimationFrame(loop);
+      } else {
+        document.getElementById('reload').style.color = '#f00';
+      }
+    }
+
+    // レンダリングの開始
+    loop();
+</script>
+</body>
+</html>
