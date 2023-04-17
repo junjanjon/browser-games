@@ -77,6 +77,10 @@
 
     // 敵機の生成
     function generateEnemyPlanes() {
+      if (bgmElement.paused) {
+        bgmElement.volume = 0.5;
+        bgmElement.play();
+      }
       if (Math.random() > 0.5) {
         enemyPlanes.push({
           x: canvas.width,
@@ -267,11 +271,6 @@
       }
     }
 
-    // レンダリングの開始
-    bgmElement.volume = 0.5;
-    bgmElement.addEventListener('canplay', () => {
-      bgmElement.play();
-    });
     loop();
 </script>
 </body>
