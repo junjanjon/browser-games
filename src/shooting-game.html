@@ -126,6 +126,13 @@ function init() {
       default:
         break;
     }
+    // プレイヤーが画面外に出ないようにする
+    if (player.x < 0) {
+      player.x = 0;
+    }
+    if (player.x > canvas.width) {
+      player.x = canvas.width;
+    }
   });
 
   setInterval(() => {
