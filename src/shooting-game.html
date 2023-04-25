@@ -9,6 +9,7 @@
   </style>
 </head>
 <body onload="init()">
+  <p id="score">Score: 0</p>
   <canvas id="canvas" width="400" height="400"></canvas>
   <script>
 const canvas = document.getElementById('canvas');
@@ -23,6 +24,8 @@ const player = {
 
 const bullets = [];
 const enemies = [];
+// スコアの初期化
+let score = 0;
 
 function drawPlayer() {
   ctx.fillStyle = player.color;
@@ -79,6 +82,22 @@ function shoot() {
   bullets.push(bullet);
 }
 
+// スコアを更新する関数
+function updateScore() {
+  // HTML要素からスコア表示用のテキスト要素を取得する
+  const scoreElement = document.getElementById('score');
+  // テキスト要素の中身を現在のスコアに更新する
+  scoreElement.textContent = `Score: ${score}`;
+}
+
+// 敵を倒したら呼ばれる関数
+function enemyKilled() {
+  // スコアを1増やす
+  score += 1;
+  // スコアを更新する
+  updateScore();
+}
+
 function detectCollision() {
   // eslint-disable-next-line no-lone-blocks
   {
@@ -90,6 +109,7 @@ function detectCollision() {
         const dy = bullets[i].y - enemies[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 15) {
+          enemyKilled();
           bulletsToRemove.push(i);
           enemiesToRemove.push(j);
         }
