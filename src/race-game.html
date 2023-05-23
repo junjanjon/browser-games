@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>レースゲーム</title>
+<style>
+canvas {
+  border: solid 1px black;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas" width="600" height="400"></canvas>
+<div class="text"><a href="https://verylonganimals.com">VeryLongAnimals</a></div>
+<div class="text"><a href="https://github.com/junjanjon/browser-games">GitHub</a></div>
+<script>
+// ランダムなアニマルを取得
+function getRandomAnimalId() {
+  return Math.floor(Math.random() * 96) + 1;
+}
+
+// 車のクラス
+class Car {
+  constructor(x, y, speed) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.animalId = getRandomAnimalId();
+    this.isLoaded = false;
+    this.image = new Image();
+    this.image.onload = () => {
+      this.isLoaded = true;
+    };
+    this.image.src = `images/very-long-animals/${this.animalId.toString().padStart(3, '0')}.png`;
+  }
+
+  // 車を描画
+  draw() {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(this.image, this.x, this.y, 100, 100);
+  }
+
+  // 車を移動
+  move() {
+    this.x += this.speed;
+  }
+}
+
+// 車の配列
+const cars = [];
+
+// 車を生成して配列に追加
+for (let i = 0; i < 5; i++) {
+  const car = new Car(0, 50 + i * 60, Math.random());
+  cars.push(car);
+}
+
+// アニメーションのループ
+function loop() {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // 背景を描画
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, 600, 400);
+
+  // 車のロードがまだならループを続ける
+  if (cars.some((car) => car.isLoaded === false)) {
+    requestAnimationFrame(loop);
+    return;
+  }
+  for (let i = 0; i < cars.length; i++) {
+    cars[i].draw();
+    cars[i].move();
+    // ゴールに到着したら
+    // if (cars[i].x > 550) {
+    //   alert(`車${i + 1}がゴールしました！`);
+    // }
+  }
+
+  // アニメーションの再生
+  requestAnimationFrame(loop);
+}
+
+// アニメーションの開始
+loop();
+</script>
+</body>
+</html>
