@@ -37,17 +37,20 @@
 <script>
     const bgmElement = document.getElementById('bgm');
     // ジェットの初期位置
-    const x = 50;
+    let x = 50;
     let y = 200;
 
     // 移動速度
     let vy = 0;
+    let vx = 0;
 
     // ジェットの大きさ
     const size = 10;
 
     // 敵機の配列
     const enemyPlanes = [];
+    // 発射した弾の配列
+    const bullets = [];
 
     // 得点
     let score = 0;
@@ -60,14 +63,24 @@
         vy = -5;
       } else if (e.key === 'ArrowDown') { // 下矢印キー
         vy = 5;
-      } else if (e.key === ' ') { // スペースキー
+      } else if (e.key === 'ArrowLeft') { // 左矢印キー
+        vx = -5;
+      } else if (e.key === 'ArrowRight') { // 右矢印キー
+        vx = 5;
+      } else if (e.key === 'r') { // リトライ R キー
         window.location.reload();
+      }
+      if (e.key === ' ') { // スペースキー
+        generateBullets();
       }
     });
 
     document.addEventListener('keyup', (e) => {
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         vy = 0;
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        vx = 0;
       }
     });
 
@@ -100,6 +113,15 @@
       }
     }
 
+    // 弾の生成
+    function generateBullets() {
+      bullets.push({
+        x: x + size,
+        y,
+        vx: 10,
+      });
+    }
+
     function scoreUpdate() {
       if (score < NORMAL_SCORE) {
         document.getElementById('score').style.color = '#fff';
@@ -115,12 +137,52 @@
     function update() {
       // ジェットの移動
       y += vy;
+      x += vx;
 
       // 画面の端に到達したら停止する
       if (y < 0) {
         y = 0;
       } else if (y > canvas.height - size) {
         y = canvas.height - size;
+      }
+      if (x < 0) {
+        x = 0;
+      } else if (x > canvas.width - size) {
+        x = canvas.width - size;
+      }
+
+      // 弾の移動と画面外の削除
+      for (let i = 0; i < bullets.length; i++) {
+        bullets[i].x += bullets[i].vx;
+
+        // 画面外に出た弾を削除
+        if (bullets[i].x > canvas.width) {
+          bullets.splice(i, 1);
+          i--;
+          continue;
+        }
+
+        // 弾と敵機の当たり判定
+        for (let j = 0; j < enemyPlanes.length; j++) {
+          if (bullets[i].x + size > enemyPlanes[j].x
+              && bullets[i].y + size > enemyPlanes[j].y
+              && bullets[i].x < enemyPlanes[j].x + enemyPlanes[j].size
+              && bullets[i].y < enemyPlanes[j].y + enemyPlanes[j].size) {
+            // 得点の加算
+            const addScore = (enemyPlanes[j].size ** 2) * (enemyPlanes[j].vx ** 2);
+            score += Math.floor(addScore / 100);
+            scoreUpdate();
+
+            // 敵機の削除
+            enemyPlanes.splice(j, 1);
+            j--;
+
+            // 弾の削除
+            bullets.splice(i, 1);
+            i--;
+            break;
+          }
+        }
       }
 
       // 敵機の移動と画面外の削除
@@ -171,6 +233,12 @@
       // ジェットの描画
       ctx.fillStyle = '#f00';
       ctx.fillRect(x, y, size, size);
+
+      // 弾の描画
+      ctx.fillStyle = '#fff';
+      for (let i = 0; i < bullets.length; i++) {
+        ctx.fillRect(bullets[i].x, bullets[i].y, size, size);
+      }
 
       // 敵機の描画
       for (let i = 0; i < enemyPlanes.length; i++) {
