@@ -37,11 +37,12 @@
 <script>
     const bgmElement = document.getElementById('bgm');
     // ジェットの初期位置
-    const x = 50;
+    let x = 50;
     let y = 200;
 
     // 移動速度
     let vy = 0;
+    let vx = 0;
 
     // ジェットの大きさ
     const size = 10;
@@ -60,6 +61,10 @@
         vy = -5;
       } else if (e.key === 'ArrowDown') { // 下矢印キー
         vy = 5;
+      } else if (e.key === 'ArrowLeft') { // 左矢印キー
+        vx = -5;
+      } else if (e.key === 'ArrowRight') { // 右矢印キー
+        vx = 5;
       } else if (e.key === ' ') { // スペースキー
         window.location.reload();
       }
@@ -68,6 +73,9 @@
     document.addEventListener('keyup', (e) => {
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         vy = 0;
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        vx = 0;
       }
     });
 
@@ -115,12 +123,18 @@
     function update() {
       // ジェットの移動
       y += vy;
+      x += vx;
 
       // 画面の端に到達したら停止する
       if (y < 0) {
         y = 0;
       } else if (y > canvas.height - size) {
         y = canvas.height - size;
+      }
+      if (x < 0) {
+        x = 0;
+      } else if (x > canvas.width - size) {
+        x = canvas.width - size;
       }
 
       // 敵機の移動と画面外の削除
